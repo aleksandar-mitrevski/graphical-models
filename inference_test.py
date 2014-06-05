@@ -20,8 +20,11 @@ resulting_distribution = exact_inference_engine.perform_inference(query_variable
 print 'P(B|m,j) - enumeration: ', resulting_distribution
 resulting_distribution = exact_inference_engine.perform_ve_inference(query_variable, evidence_variables)
 print '(B|m,j) - variable elimination: ', resulting_distribution
-resulting_distribution = approximate_inference_engine.perform_inference(query_variable, evidence_variables, 100000)
-print 'P(B|m,j) - approximate: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_rs_inference(query_variable, evidence_variables, 100000)
+print 'P(B|m,j) - approximate - rejection sampling: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_lw_inference(query_variable, evidence_variables, 100000)
+print 'P(B|m,j) - approximate - likelihood weighting: ', resulting_distribution
+print
 
 query_variable = 'JohnCalls'
 evidence_variables = {'MaryCalls': 'true'}
@@ -29,5 +32,7 @@ resulting_distribution = exact_inference_engine.perform_inference(query_variable
 print 'P(j|m) - enumeration: ', resulting_distribution
 resulting_distribution = exact_inference_engine.perform_ve_inference(query_variable, evidence_variables)
 print '(j|m) - variable elimination: ', resulting_distribution
-resulting_distribution = approximate_inference_engine.perform_inference(query_variable, evidence_variables, 100000)
-print 'P(j|m) - approximate: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_rs_inference(query_variable, evidence_variables, 100000)
+print 'P(j|m) - approximate - rejection sampling: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_lw_inference(query_variable, evidence_variables, 100000)
+print 'P(B|m,j) - approximate - likelihood weighting: ', resulting_distribution
