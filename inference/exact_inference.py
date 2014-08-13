@@ -7,7 +7,7 @@ class ExactInferenceEngine(object):
         """Defines an engine for performing exact inference in a discrete Bayesian network.
 
         Keyword arguments:
-        network -- A 'libpgm.discretebayesiannetwork' object representing a discrete Bayesian network.
+        network -- A 'libpgm.discretebayesiannetwork.DiscreteBayesianNetwork' object representing a discrete Bayesian network.
 
         """
         self.network = network
