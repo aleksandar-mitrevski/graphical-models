@@ -80,6 +80,47 @@ class ApproximateInferenceEngine(object):
                 distribution[key] = distribution[key] / normaliser
         return distribution
 
+    def perform_gibbs_inference(self, query_variable, evidence_variables, number_of_samples):
+        """Calculates the probability distribution P(query_variable|evidence_variables)
+        using Gibbs sampling. Assumes that we have only one query variable.
+
+        Keyword arguments:
+        query_variable -- The name of the query variable (as called in the network).
+        evidence_variables -- A dictionary containing variable names as keys and observed values as values.
+        number_of_samples -- The number of samples that should be used in the sampling process.
+
+        Returns:
+        distribution -- A dictionary containing the values of the query variable as keys and the probabilities as values.
+
+        """
+        distribution = dict()
+        number_of_variable_values = len(self.network.Vdata[query_variable]['vals'])
+        for i in xrange(number_of_variable_values):
+            distribution[self.network.Vdata[query_variable]['vals'][i]] = 0.
+
+        variable_assignments = dict()
+
+        #we initialise the variables randomly before generating samples
+        for _,variable in enumerate(self.network.V):
+            if variable in evidence_variables.keys():
+                variable_assignments[variable] = evidence_variables[variable]
+            else:
+                value_index = numpy.random.randint(0,len(self.network.Vdata[variable]['vals']))
+                variable_assignments[variable] = self.network.Vdata[variable]['vals'][value_index]
+
+        for i in xrange(number_of_samples):
+            variable_assignments = self.generate_gibbs_sample(variable_assignments, evidence_variables)
+            distribution[variable_assignments[query_variable]] = distribution[variable_assignments[query_variable]] + 1.
+
+        normaliser = 0.
+        for key in distribution.keys():
+            normaliser = normaliser + distribution[key]
+
+        if normaliser > 1e-10:
+            for key in distribution.keys():
+                distribution[key] = distribution[key] / normaliser
+        return distribution
+
     def generate_rs_sample(self):
         """Generates a random assignment for the variables in the network.
         The assignment respects the conditional probabilities in the network.
@@ -113,7 +154,7 @@ class ApproximateInferenceEngine(object):
             while value_index < number_of_values and random_number > cumulative_distribution[value_index]:
                 value_index = value_index + 1
 
-            #we decrease the index by 1 because of the additional value in the the cumulative distribution array
+            #we decrease the index by 1 because of the additional value in the cumulative distribution array
             value_index = value_index - 1
             assigned_values[current_variable] = self.network.Vdata[current_variable]['vals'][value_index]
 
@@ -167,11 +208,77 @@ class ApproximateInferenceEngine(object):
                 while value_index < number_of_values and random_number > cumulative_distribution[value_index]:
                     value_index = value_index + 1
 
-                #we decrease the index by 1 because of the additional value in the the cumulative distribution array
+                #we decrease the index by 1 because of the additional value in the cumulative distribution array
                 value_index = value_index - 1
                 assigned_values[current_variable] = self.network.Vdata[current_variable]['vals'][value_index]
 
         return assigned_values, weight
+
+    def generate_gibbs_sample(self, variable_assignments, evidence_variables):
+        """Generates a random assignment for the non-evidence variables in the network,
+        sampling each of them given their Markov blanket.
+
+        Keyword arguments:
+        variable_assignments -- A dictionary containing variable names as keys and variable assignments as values.
+        evidence_variables -- A dictionary containing variable names as keys and observed values as values.
+
+        Returns:
+        variable_assignments -- A dictionary containing variable names as keys and variable assignments as values.
+
+        """
+        variables_to_sample = list(set(self.network.V) - set(evidence_variables.keys()))
+
+        for _,variable in enumerate(variables_to_sample):
+            #we calculate the product of the probabilities of the children
+            #given their parents if the variable has any children
+            value_probabilities = dict()
+            for _,value in enumerate(self.network.Vdata[variable]['vals']):
+                value_probabilities[value] = 1.
+
+            if self.network.Vdata[variable]['children'] != None:
+                for _,value in enumerate(self.network.Vdata[variable]['vals']):
+                    alternative_assignments = dict(variable_assignments)
+                    alternative_assignments[variable] = value
+                    children_probability_product = 1.
+
+                    for _,child in enumerate(self.network.Vdata[variable]['children']):
+                        value_index = self.network.Vdata[child]['vals'].index(variable_assignments[child])
+                        parent_values = self.get_parent_values(child, alternative_assignments)
+                        children_probability_product = children_probability_product * self.network.Vdata[child]['cprob'][parent_values][value_index]
+                    value_probabilities[value] = children_probability_product
+
+            parent_values = self.get_parent_values(variable, variable_assignments)
+            normaliser = 0.
+
+            #we multiply the children probability by the probability of the
+            #current variable given its parents (or by its prior if it has no parents)
+            if parent_values == None:
+                for i,value in enumerate(self.network.Vdata[variable]['vals']):
+                    value_probabilities[value] = value_probabilities[value] * self.network.Vdata[variable]['cprob'][i]
+                    normaliser = normaliser + value_probabilities[value]
+            else:
+                for i,value in enumerate(self.network.Vdata[variable]['vals']):
+                    value_probabilities[value] = value_probabilities[value] * self.network.Vdata[variable]['cprob'][parent_values][i]
+                    normaliser = normaliser + value_probabilities[value]
+
+            for _,key in enumerate(value_probabilities.keys()):
+                value_probabilities[key] = value_probabilities[key] / normaliser
+
+            cumulative_distribution = [0.]
+            for i,value in enumerate(self.network.Vdata[variable]['vals']):
+                cumulative_distribution.append(cumulative_distribution[i] + value_probabilities[value])
+
+            value_index = 1
+            number_of_values = len(cumulative_distribution)
+            random_number = numpy.random.rand()
+            while value_index < number_of_values and random_number > cumulative_distribution[value_index]:
+                value_index = value_index + 1
+
+            #we decrease the index by 1 because of the additional value in the cumulative distribution array
+            value_index = value_index - 1
+            variable_assignments[variable] = self.network.Vdata[variable]['vals'][value_index]
+
+        return variable_assignments
 
     def get_parent_values(self, variable, assigned_values):
         """Returns the assigned values to the parent variables of a given variable.

@@ -24,6 +24,8 @@ resulting_distribution = approximate_inference_engine.perform_rs_inference(query
 print 'P(B|m,j) - approximate - rejection sampling: ', resulting_distribution
 resulting_distribution = approximate_inference_engine.perform_lw_inference(query_variable, evidence_variables, 100000)
 print 'P(B|m,j) - approximate - likelihood weighting: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_gibbs_inference(query_variable, evidence_variables, 100000)
+print 'P(B|m,j) - approximate - Gibbs: ', resulting_distribution
 print
 
 query_variable = 'JohnCalls'
@@ -35,4 +37,6 @@ print '(j|m) - variable elimination: ', resulting_distribution
 resulting_distribution = approximate_inference_engine.perform_rs_inference(query_variable, evidence_variables, 100000)
 print 'P(j|m) - approximate - rejection sampling: ', resulting_distribution
 resulting_distribution = approximate_inference_engine.perform_lw_inference(query_variable, evidence_variables, 100000)
-print 'P(B|m,j) - approximate - likelihood weighting: ', resulting_distribution
+print 'P(j|m) - approximate - likelihood weighting: ', resulting_distribution
+resulting_distribution = approximate_inference_engine.perform_gibbs_inference(query_variable, evidence_variables, 100000)
+print 'P(j|m) - approximate - Gibbs: ', resulting_distribution
