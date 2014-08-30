@@ -2,7 +2,7 @@ from trbm_base import TRBMBase
 import numpy
 import math
 
-class TRBM(TRBMBase):
+class TRBMContinuous(TRBMBase):
     def __init__(self, number_visible_units, number_hidden_units, order=1):
         self.number_visible_units = number_visible_units
         self.number_hidden_units = number_hidden_units
@@ -153,12 +153,7 @@ class TRBM(TRBMBase):
 
         for neuron in xrange(self.number_visible_units):
             prob = self._sigmoid(current_time_visible_bias_values[neuron] + visible_bias[neuron])
-            threshold = numpy.random.rand()
-
-            if prob > threshold:
-                visible_units[neuron] = 1.
-            else:
-                visible_units[neuron] = 0.
+            visible_units[neuron] = prob
 
         self._shift_visible_vectors_back()
         return visible_units
@@ -196,12 +191,7 @@ class TRBM(TRBMBase):
 
             for neuron in xrange(self.number_visible_units):
                 prob = self._sigmoid(current_time_visible_bias_values[neuron] + visible_bias[neuron])
-                threshold = numpy.random.rand()
-
-                if prob > threshold:
-                    visible_units[neuron] = 1.
-                else:
-                    visible_units[neuron] = 0.
+                visible_units[neuron] = prob
 
         return visible_units, hidden_units
 
@@ -227,11 +217,6 @@ class TRBM(TRBMBase):
 
             for neuron in xrange(self.number_visible_units):
                 prob = self._sigmoid(numpy.sum(self.connection_weights[neuron,:] * hidden_units) + self.visible_bias[neuron])
-                threshold = numpy.random.rand()
-
-                if prob > threshold:
-                    visible_units[neuron] = 1.
-                else:
-                    visible_units[neuron] = 0.
+                visible_units[neuron] = prob
 
         return hidden_units
