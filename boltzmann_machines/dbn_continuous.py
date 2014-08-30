@@ -2,7 +2,7 @@ from dbn_base import DBNBase
 import numpy
 import math
 
-class DBN(DBNBase):
+class DBNContinuous(DBNBase):
     def __init__(self, number_visible_units, number_hidden_units, layers=1):
         """Creates an architecture for a deep belief network.
 
@@ -96,8 +96,7 @@ class DBN(DBNBase):
         if vector != None:
             self.neuron_values[0] = numpy.array(vector)
         else:
-            for i in xrange(self.number_visible_units):
-                self.neuron_values[0][i] = numpy.random.randint(0,2)
+            self.neuron_values[0] = numpy.random.rand(self.number_visible_units)
 
         for layer in xrange(self.layers):
             number_hidden_units = len(self.neuron_values[layer+1])
@@ -114,12 +113,7 @@ class DBN(DBNBase):
             number_visible_units = len(self.neuron_values[layer])
             for neuron in xrange(number_visible_units):
                 prob = self._logistic(numpy.sum(self.connection_weights[layer][neuron,:] * self.neuron_values[layer+1]) + self.biases[layer][neuron])
-                threshold = numpy.random.rand()
-
-                if prob > threshold:
-                    self.neuron_values[layer][neuron] = 1.
-                else:
-                    self.neuron_values[layer][neuron] = 0.
+                self.neuron_values[layer][neuron] = prob
 
         return numpy.array(self.neuron_values[0])
 
@@ -156,11 +150,6 @@ class DBN(DBNBase):
 
             for neuron in xrange(number_visible_units):
                 prob = self._logistic(numpy.sum(self.connection_weights[layer][neuron,:] * hidden_units) + visible_biases[neuron])
-                threshold = numpy.random.rand()
-
-                if prob > threshold:
-                    visible_units[neuron] = 1.
-                else:
-                    visible_units[neuron] = 0.
+                visible_units[neuron] = prob
 
         return visible_units

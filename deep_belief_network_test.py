@@ -1,5 +1,6 @@
 import numpy
-from undirected.dbn import DBN
+from boltzmann_machines.dbn import DBN
+from boltzmann_machines.dbn_continuous import DBNContinuous
 
 data = []
 for i in xrange(1000):
@@ -11,4 +12,7 @@ for i in xrange(1000):
 
 data = numpy.array(data)
 network = DBN(10,[15])
+network.train(data, epochs=10, learning_rate=0.1)
+
+network = DBNContinuous(10,[15])
 network.train(data, epochs=10, learning_rate=0.1)
