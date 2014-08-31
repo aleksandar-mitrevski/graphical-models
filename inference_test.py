@@ -7,8 +7,8 @@ from inference.approximate_inference import ApproximateInferenceEngine
 
 node_data = NodeData()
 network_skeleton = GraphSkeleton()
-node_data.load('network.txt')
-network_skeleton.load('network.txt')
+node_data.load('test_bayesian_networks/network.txt')
+network_skeleton.load('test_bayesian_networks/network.txt')
 network = DiscreteBayesianNetwork(network_skeleton, node_data)
 
 exact_inference_engine = ExactInferenceEngine(network)

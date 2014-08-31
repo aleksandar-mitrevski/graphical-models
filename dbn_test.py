@@ -6,7 +6,7 @@ from libpgm.dyndiscbayesiannetwork import DynDiscBayesianNetwork
 
 from inference.sensor_dbn_inference import SensorDbnInference
 
-network_file = open('sensor_dbn.txt', 'r')
+network_file = open('test_bayesian_networks/sensor_dbn.txt', 'r')
 network_file_data = eval(network_file.read())
 
 network_skeleton = GraphSkeleton()
