@@ -1,0 +1,49 @@
+{
+    "V": ["state", "measurement"],
+    "E": [["state", "measurement"]],
+    "initial_Vdata": {
+        "state": {
+            "ord": 1,
+            "numoutcomes": 2,
+            "vals": ["working", "broken"],
+            "parents": None,
+            "children": ["measurement"],
+            "cprob": [1.0, 0.0]
+        },
+        "measurement": {
+            "ord": 2,
+            "numoutcomes": 9,
+            "vals": ["00", "01", "02", "10", "11", "12", "20", "21", "22"],
+            "parents": ["state"],
+            "children": None,
+            "cprob": {
+                "['working']": [0.50507766, 0.24800876, 0.24691358, 0.5056, 0.2494, 0.245, 0.49303734, 0.25469223, 0.25227043],
+                "['broken']": [0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111]
+            }
+        }
+    },
+    "twotbn_Vdata": {
+        "state": {
+            "ord": 1,
+            "numoutcomes": 2,
+            "vals": ["working", "broken"],
+            "parents": ["past_state"],
+            "children": ["measurement"],
+            "cprob": {
+                "['working']": [0.97, 0.03],
+                "['broken']": [0.0, 1.0]
+            }
+        },
+        "measurement": {
+            "ord": 2,
+            "numoutcomes": 9,
+            "vals": ["00", "01", "02", "10", "11", "12", "20", "21", "22"],
+            "parents": ["state"],
+            "children": None,
+            "cprob": {
+                "['working']": [0.50507766, 0.24800876, 0.24691358, 0.5056, 0.2494, 0.245, 0.49303734, 0.25469223, 0.25227043],
+                "['broken']": [0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111, 0.11111111]
+            }
+        }
+    }
+}
